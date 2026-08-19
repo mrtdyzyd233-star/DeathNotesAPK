@@ -1,0 +1,50 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get source code
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y \
+            git zip unzip openjdk-17-jdk \
+            python3-pip autoconf libtool pkg-config \
+            zlib1g-dev libncurses5-dev libncursesw5-dev \
+            libtinfo5 cmake libffi-dev libssl-dev
+
+      - name: Install Buildozer
+        run: |
+          pip3 install --user buildozer cython
+
+      - name: Create buildozer.spec
+        run: |
+          ~/.local/bin/buildozer init
+
+      - name: Configure APK
+        run: |
+          sed -i 's/^title = .*/title = Death Notes/' buildozer.spec
+          sed -i 's/^package.name = .*/package.name = deathnotes/' buildozer.spec
+          sed -i 's/^package.domain = .*/package.domain = org.deathnotes/' buildozer.spec
+          sed -i 's/^requirements = .*/requirements = python3,kivy/' buildozer.spec
+          sed -i 's/^orientation = .*/orientation = portrait/' buildozer.spec
+
+      - name: Build APK
+        run: |
+          ~/.local/bin/buildozer -v android debug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: DeathNotes-APK
+          path: bin/*.apk 
