@@ -22,7 +22,9 @@ jobs:
                 - name: Accept Android licenses
         run: |
           yes | ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses || true
-      - name: Install dependencies
+           - name: Accept Android licenses
+        run: |
+          yes | ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses || true - name: Install dependencies
         run: |
           sudo apt update
           sudo apt install -y \
